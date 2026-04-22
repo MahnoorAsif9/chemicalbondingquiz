@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chemical Bonding Exam Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#00c6ff,#0072ff);
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+}
+
+.container{
+width:95%;
+max-width:1100px;
+background:white;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 20px 40px rgba(0,0,0,0.2);
+display:flex;
+}
+
+.main{flex:3;}
+.sidebar{
+display:none;
+flex:1;
+background:#eef7ff;
+padding:15px;
+border-left:2px solid #ddd;
+overflow-y:auto;
+}
+
+.header{
+background:linear-gradient(135deg,#00c9a7,#92fe9d);
+color:white;
+text-align:center;
+padding:20px;
+}
+
+.screen{padding:30px;text-align:center;}
+
+input{
+padding:12px;
+width:60%;
+border-radius:10px;
+border:1px solid #ccc;
+}
+
+button{
+padding:10px 18px;
+border:none;
+border-radius:20px;
+background:#00c9a7;
+color:white;
+cursor:pointer;
+margin-top:10px;
+}
+
+.quiz{padding:20px;}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+font-weight:bold;
+margin-bottom:10px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.timer{color:#ff3b3b;}
+
+.question{
+font-size:20px;
+margin-bottom:15px;
+}
+
+.option{
+background:#f1f1f1;
+padding:12px;
+margin:8px 0;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.option:hover{background:#dff6ff;}
+
+.option.correct{background:#2ecc71;color:white;}
+.option.wrong{background:#e74c3c;color:white;}
+
+.navbtns{
+display:flex;
+justify-content:space-between;
+margin-top:15px;
+gap:8px;
+flex-wrap:wrap;
+}
+
+.qbtn{
+width:35px;height:35px;
+margin:4px;
+border-radius:50%;
+border:none;
+cursor:pointer;
+background:#ddd;
+}
+
+.qbtn.active{background:#00c9a7;color:white;}
+.qbtn.answered{background:#0072ff;color:white;}
+
+.result{padding:25px;}
+
+.card{
+background:#f8f9fa;
+padding:15px;
+margin:10px 0;
+border-radius:10px;
+border-left:5px solid;
+}
+
+.right{border-left-color:#2ecc71;}
+.wrongc{border-left-color:#e74c3c;}
+
+.score{
+font-size:3rem;
+text-align:center;
+color:#00c9a7;
+font-weight:bold;
+}
+
+.leaderboard{
+margin-top:20px;
+padding:15px;
+background:#f1f1f1;
+border-radius:10px;
+text-align:left;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="main">
+<div class="header">
+<h2>🧪 CHEMICAL BONDING MDCAT & AFNS PRO</h2>
+</div>
+
+<!-- LOGIN -->
+<div id="start" class="screen">
+<h2>Enter Test</h2>
+<input id="name" placeholder="Enter Your Name">
+
+<div class="leaderboard">
+<h3>🏆 Leaderboard</h3>
+<div id="board">Loading...</div>
+</div>
+
+<button onclick="start()">Start Exam</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="quiz" style="display:none;">
+<div class="topbar">
+<div>Score: <span id="score">0</span></div>
+<div>Q: <span id="qno">1</span>/35</div>
+<div class="timer">⏱ <span id="time">15:00</span></div>
+</div>
+
+<div id="box"></div>
+
+<div class="navbtns">
+<button onclick="prevQ()">⬅ Previous</button>
+<button onclick="nextQ()">Next ➡</button>
+<button onclick="showResult()" style="background:red;">⛔ End Test</button>
+</div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="result" style="display:none;"></div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h3>📌 Questions</h3>
+<div id="nav"></div>
+</div>
+
+</div>
+
+<script>
+
+/* ---------------- CHEMICAL BONDING MCQs ---------------- */
+
+const questions = [
+{q:"The bond angle in NH₃ is less than 109.5° because of:",o:["Lone pair–lone pair repulsion","Bond pair–bond pair attraction","Ionic character","Resonance"],a:0,e:"Lone pair repels more strongly, reducing bond angle."},
+{q:"Hybridization of XeF₄ is:",o:["sp³","sp³d","sp³d²","d²sp³"],a:2,e:"4 bond pairs + 2 lone pairs = sp³d²."},
+{q:"Which molecule is linear?",o:["SO₂","CO₂","NH₃","H₂O"],a:1,e:"CO₂ has no lone pair on central atom."},
+{q:"The strongest bond among following is:",o:["Single bond","Double bond","Triple bond","Hydrogen bond"],a:2,e:"Triple bond has maximum electron sharing."},
+{q:"Which has maximum polarity?",o:["HCl","HF","HBr","HI"],a:1,e:"HF has highest electronegativity difference."},
+{q:"Hybridization of carbon in CH₄ is:",o:["sp","sp²","sp³","dsp²"],a:2,e:"4 sigma bonds → sp³."},
+{q:"Which molecule shows hydrogen bonding?",o:["CH₄","NH₃","CO₂","CH₃Cl"],a:1,e:"N–H bond enables H-bonding."},
+{q:"Shape of BF₃ is:",o:["Tetrahedral","Trigonal planar","Bent","Linear"],a:1,e:"sp² hybridization."},
+{q:"Which has highest bond order?",o:["O₂","O₂⁺","O₂⁻","O₂²⁻"],a:1,e:"Removal of electron increases bond order."},
+{q:"In CO₂, carbon is:",o:["sp","sp²","sp³","dsp²"],a:0,e:"Linear molecule → sp."},
+{q:"Which molecule is non-polar?",o:["NH₃","H₂O","CO₂","HCl"],a:2,e:"Symmetrical linear molecule."},
+{q:"Which has resonance?",o:["CH₄","O₃","NH₃","H₂"],a:1,e:"O₃ shows delocalization."},
+{q:"Bond order of N₂ is:",o:["1","2","3","4"],a:2,e:"Triple bond."},
+{q:"Geometry of PCl₅ is:",o:["Tetrahedral","Trigonal bipyramidal","Octahedral","Linear"],a:1,e:"sp³d hybridization."},
+{q:"Which has zero dipole moment?",o:["H₂O","NH₃","CO₂","SO₂"],a:2,e:"Symmetrical structure."},
+{q:"Shape of H₂O is:",o:["Linear","Bent","Tetrahedral","Trigonal planar"],a:1,e:"2 lone pairs."},
+{q:"Hybridization of BeCl₂ is:",o:["sp","sp²","sp³","dsp²"],a:0,e:"Linear molecule."},
+{q:"Which bond has maximum ionic character?",o:["H–Cl","Na–Cl","C–Cl","H–F"],a:1,e:"Large electronegativity difference."},
+{q:"Which is paramagnetic?",o:["N₂","O₂","CO₂","H₂"],a:1,e:"O₂ has unpaired electrons."},
+{q:"Shape of NH₃ is:",o:["Linear","Trigonal planar","Trigonal pyramidal","Tetrahedral"],a:2,e:"One lone pair."},
+{q:"Strongest hydrogen bonding is in:",o:["HF","HCl","HBr","HI"],a:0,e:"Fluorine is most electronegative."},
+{q:"Bond angle in H₂O is:",o:["120°","109.5°","104.5°","180°"],a:2,e:"Lone pair repulsion reduces angle."},
+{q:"Trigonal planar molecule is:",o:["CH₄","BF₃","NH₃","H₂O"],a:1,e:"sp² hybridization."},
+{q:"Bond order of O₂ is:",o:["1","2","3","4"],a:1,e:"Double bond."},
+{q:"Hybridization in SF₆ is:",o:["NH₃","SF₆","BF₃","CO₂"],a:1,e:"Octahedral → sp³d²."},
+{q:"Most stable molecule is:",o:["O₂⁻","O₂²⁻","O₂","O₂⁺"],a:2,e:"Highest bond order."},
+{q:"Shape of SF₆ is:",o:["Tetrahedral","Octahedral","Trigonal bipyramidal","Linear"],a:1,e:"sp³d²."},
+{q:"Weakest bond is:",o:["Single","Double","Triple","Ionic"],a:0,e:"Single bond least energy."},
+{q:"Maximum bond length is in:",o:["Triple","Double","Single","Ionic"],a:2,e:"Single bond longest."},
+{q:"Shape of CO₂ is:",o:["Bent","Linear","Trigonal planar","Tetrahedral"],a:1,e:"sp hybridization."},
+{q:"Which has lone pair on central atom?",o:["CO₂","BF₃","NH₃","BeCl₂"],a:2,e:"Nitrogen has lone pair."},
+{q:"Hybridization of C in C₂H₄ is:",o:["sp","sp²","sp³","dsp²"],a:1,e:"Double bond."},
+{q:"Non-linear molecule is:",o:["CO₂","H₂O","BeCl₂","N₂"],a:1,e:"Bent shape."},
+{q:"Bond order increases when:",o:["Electrons added","Electrons removed","Temperature increases","Volume increases"],a:1,e:"Less antibonding electrons."},
+{q:"Maximum covalent character is in:",o:["NaCl","KCl","MgCl₂","AlCl₃"],a:3,e:"Fajan’s rule."}
+];
+
+/* ---------------- SAME JS LOGIC (UNCHANGED) ---------------- */
+
+let current = 0;
+let score = 0;
+let time = 900;
+let timer = null;
+let name = "";
+let answers = Array(35).fill(null);
+let locked = Array(35).fill(false);
+let submitted = false;
+
+function start(){
+name = document.getElementById("name").value.trim();
+if(!name){alert("Enter name");return;}
+
+document.getElementById("start").style.display="none";
+document.getElementById("quiz").style.display="block";
+document.querySelector(".sidebar").style.display="block";
+
+renderNav();
+load();
+runTimer();
+}
+
+function runTimer(){
+timer = setInterval(()=>{
+time--;
+let m=Math.floor(time/60);
+let s=time%60;
+document.getElementById("time").innerText=`${m}:${s<10?"0"+s:s}`;
+if(time<=0) showResult();
+},1000);
+}
+
+function load(){
+let q=questions[current];
+document.getElementById("qno").innerText=current+1;
+
+let html=`<div class="question">${current+1}. ${q.q}</div>`;
+
+q.o.forEach((opt,i)=>{
+let cls="option";
+if(answers[current]!=null){
+if(i===q.a)cls+=" correct";
+else if(i===answers[current])cls+=" wrong";
+}
+html+=`<div class="${cls}" onclick="ans(${i})">${opt}</div>`;
+});
+
+document.getElementById("box").innerHTML=html;
+updateNav();
+}
+
+function ans(i){
+if(locked[current])return;
+answers[current]=i;
+locked[current]=true;
+if(i===questions[current].a)score++;
+document.getElementById("score").innerText=score;
+load();
+}
+
+function nextQ(){if(current<34){current++;load();}}
+function prevQ(){if(current>0){current--;load();}}
+
+function renderNav(){
+let nav="";
+for(let i=0;i<35;i++){
+nav+=`<button class="qbtn" onclick="go(${i})">${i+1}</button>`;
+}
+document.getElementById("nav").innerHTML=nav;
+updateNav();
+}
+
+function go(i){current=i;load();}
+
+function updateNav(){
+document.querySelectorAll(".qbtn").forEach((b,i)=>{
+b.classList.remove("active","answered");
+if(i===current)b.classList.add("active");
+if(answers[i]!=null)b.classList.add("answered");
+});
+}
+
+function showResult(){
+if(submitted)return;
+submitted=true;
+clearInterval(timer);
+
+document.getElementById("quiz").style.display="none";
+document.getElementById("result").style.display="block";
+document.querySelector(".sidebar").style.display="none";
+
+let html=`<div class="score">${score}/35</div><h3>${name}</h3>`;
+
+questions.forEach((q,i)=>{
+let user=answers[i];
+html+=`
+<div class="card ${user===q.a?'right':'wrongc'}">
+<b>Q${i+1}:</b> ${q.q}<br><br>
+<b>Your Answer:</b> ${user!=null?q.o[user]:"Not Answered"}<br>
+<b>Correct:</b> ${q.o[q.a]}<br><br>
+<b>Explanation:</b> ${q.e}
+</div>`;
+});
+
+document.getElementById("result").innerHTML=html;
+}
+
+</script>
+
+</body>
+</html>
